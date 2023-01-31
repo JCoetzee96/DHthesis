@@ -202,6 +202,42 @@ print('\nuser-curated playlists:')
 print('The average number of genres per playlist:', round(df_1000_counts.n_genres.mean()))
 print('The average number of followers per playlist:', round(df_1000_counts.n_followers.mean()))
 
+# function to lowercase and remove punctuations
+def clean_text(text):
+    text = ' '.join(character.lower() for character in text)
+    for punctuation in string.punctuation:
+        text = text.replace(punctuation, '')
+    return text
+
+def clean_data(df):
+    new_df = df.copy()
+    new_df['playlist_name'] = new_df['playlist_name'].str.split(' ')
+    new_df['playlist_name'] = new_df['playlist_name'].apply(clean_text)
+    return new_df
+
+def genre_playlist(df):
+    count = 0
+    for idx, row in df.iterrows():
+        genres = row['genres']
+        playlist_name = row['playlist_name']
+        for genre in genres:
+            if genre in playlist_name:
+                count += 1
+    return count
+
+clean_500 = clean_data(df_500_new)
+clean_1000 = clean_data(df_1000_new)
+
+print('Number of rows in the cleaned Spotify dataset:',clean_500.shape[0])
+print('Number of times the a genre of the playlist is mentioned in the playlist name:',
+      genre_playlist(clean_500))
+print(round(genre_playlist(clean_500) / clean_500.shape[0], 2))
+
+print('\nNumber of rows in the cleaned user-curated playlists dataset:',clean_1000.shape[0])
+print('Number of times the a genre of the playlist is mentioned in the playlist name:',
+      genre_playlist(clean_1000))
+print(round(genre_playlist(clean_1000) / clean_1000.shape[0], 2))
+
 # create random sample of the user-curated playlists
 df_1000_final = df_1000_new.sample(n=486, random_state=52)
 df_1000_final.info()
