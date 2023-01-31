@@ -16,6 +16,7 @@ print(df_1000_OG.info())
 # inspect what the dataframe looks like
 df_500_OG.head()
 
+# function to create and save a boxplot of the distribution of the total number of songs in a dataframe
 def boxplot_total(df, filename):
     plt.figure(figsize=(12,2))
     df.groupby('playlist_id')['track_name'].count().sort_values(ascending=False).plot.box(vert=0);
@@ -25,6 +26,7 @@ def boxplot_total(df, filename):
     plt.savefig(f'{filename}.png', bbox_inches='tight')
     plt.show()
 
+# function to create and save a boxplot of the distribution of the number of unique songs in a dataframe
 def boxplot_unique(df, filename):
     plt.figure(figsize=(12,2))
     df.groupby('playlist_id')['track_name'].nunique().sort_values(ascending=False).plot.box(vert=0);
@@ -58,23 +60,29 @@ df_500.head()
 
 df_1000.head()
 
+# function to create a new DataFrame with the required features, grouped per playlist ID
 def playlist_genres(df):
+    
     result = {}
     user_ids = []
     followers = []
+    
     for idx, row in df.iterrows():
-        if isinstance(row['primary_artist_genres'], str) and row['primary_artist_genres'].startswith('{'):
+        
+        if isinstance(row['primary_artist_genres'], str) and row['primary_artist_genres'].startswith('{'): # only include row if genre column exists and includes a string that starts with '{'
             genres = eval(row['primary_artist_genres'])
             playlist_id = row['playlist_id']
             playlist_name = row['playlist_name']
             user_id = row['user_id']
             n_followers = row['playlist_followers']
+            
             if playlist_id not in result:
                 result[playlist_id] = {}
                 user_ids.append(user_id)
                 followers.append(n_followers)
                 result[playlist_id][playlist_name] = {}
                 result[playlist_id][playlist_name]['genres'] = []
+                
             for genre in genres:
                 if genre not in result[playlist_id][playlist_name]['genres'] and str(genre) != 'nan':
                     result[playlist_id][playlist_name]['genres'].append(genre)
@@ -82,10 +90,11 @@ def playlist_genres(df):
     playlist_ids = []
     names = []
     g = []
+    
     for key, value in result.items(): # key is playlist_id
         playlist_ids.append(key)
-        # k = playlist_name, v = genres
-        for k, v in value.items():
+        
+        for k, v in value.items(): # k = playlist_name, v = genres
             names.append(k)
             for i, j in v.items(): # i = genre, j = list of genres
                 g.append(j)
@@ -115,6 +124,7 @@ print(df_1000_new.isna().sum() * 100 / len(df_1000_new))
 df_1000_new = df_1000_new.dropna()
 print(df_1000_new.isna().sum() * 100 / len(df_1000_new)) # remove missing values
 
+# function to create a dictionary, in which the key is the genre and the value the frequency
 def counter(df, column):
     count = {}
     for idx, row in df.iterrows():
@@ -132,6 +142,7 @@ print('Number of unique genres in Spotify-curated playlists dataset:',len(genre_
 print('Number of unique genres in user-curated playlists dataset:',len(genre_count_1000))
 print('\n',genre_count_500)
 
+# function to create and save barplots of a dictionary
 def plot_distribution(dict, N, filename):
     myDict = {key:val for key, val in dict.items() if val > N}
     lists = sorted(myDict.items(), key=lambda kv: kv[1], reverse=False)
@@ -150,6 +161,7 @@ def plot_distribution(dict, N, filename):
 plot_distribution(genre_count_500, 100, 'genres_500')
 plot_distribution(genre_count_1000, 500, 'genres_1000')
 
+# function to obtain the percentages of the key, value in a dictionary within the whole dictionary
 def get_percentages(dict):
     perc_dict = {}
     total = sum(dict.values())
@@ -165,6 +177,7 @@ dict_genres_1000 = get_percentages(genre_count_1000)
 percentages_genres_1000 = pd.DataFrame(dict_genres_1000.items(), columns=["Genre", "Percentage"]).sort_values(by='Percentage', ascending=False)
 percentages_genres_1000.head(32)
 
+# function to count the number of genres within a single value 
 def count_columns(df):
     new_df = df.copy()
     count_genres = []
@@ -195,6 +208,7 @@ df_1000_final.info()
 
 df_1000_final.head()
 
+# function to split the genres over rows according to the corresponding playlist
 def split_sets(df):
     gen = df['genres'].apply(pd.Series).reset_index().melt(id_vars='index').dropna()[['index', 'value']].set_index('index')
     new_df = gen.merge(df_500_new[['playlist_id', 'playlist_name']], left_index=True, right_index=True, how='right').rename(columns={'value':'genre'})
@@ -206,5 +220,6 @@ df_500_finalfinal.head()
 df_1000_finalfinal = split_sets(df_1000_final)
 df_1000_finalfinal.head()
 
+# save the newly created datasets
 df_500_finalfinal.to_csv('spotify_final.csv')
 df_1000_finalfinal.to_csv('non_spotify_final.csv')
