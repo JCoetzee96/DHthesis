@@ -177,31 +177,6 @@ dict_genres_1000 = get_percentages(genre_count_1000)
 percentages_genres_1000 = pd.DataFrame(dict_genres_1000.items(), columns=["Genre", "Percentage"]).sort_values(by='Percentage', ascending=False)
 percentages_genres_1000.head(32)
 
-# function to count the number of genres within a single value 
-def count_columns(df):
-    new_df = df.copy()
-    count_genres = []
-    for idx, row in new_df.iterrows():
-        genres = row['genres']
-        count_genres.append(len(genres))
-    new_df['n_genres'] = count_genres
-    new_df = new_df.sort_values(['n_genres'], ascending=False)
-    return new_df
-    
-df_500_counts = count_columns(df_500_new)
-df_500_counts.head()
-
-df_1000_counts = count_columns(df_1000_new)
-df_1000_counts.head()
-
-print('Spotify-curated playlists:')
-print('The average number of genres per playlist:', round(df_500_counts.n_genres.mean()))
-print('The average number of followers per playlist:', round(df_500_counts.n_followers.mean()))
-
-print('\nuser-curated playlists:')
-print('The average number of genres per playlist:', round(df_1000_counts.n_genres.mean()))
-print('The average number of followers per playlist:', round(df_1000_counts.n_followers.mean()))
-
 # function to lowercase and remove punctuations
 def clean_text(text):
     text = ' '.join(character.lower() for character in text)
@@ -237,6 +212,31 @@ print('\nNumber of rows in the cleaned user-curated playlists dataset:',clean_10
 print('Number of times the a genre of the playlist is mentioned in the playlist name:',
       genre_playlist(clean_1000))
 print(round(genre_playlist(clean_1000) / clean_1000.shape[0], 2))
+
+# function to count the number of genres within a single value 
+def count_columns(df):
+    new_df = df.copy()
+    count_genres = []
+    for idx, row in new_df.iterrows():
+        genres = row['genres']
+        count_genres.append(len(genres))
+    new_df['n_genres'] = count_genres
+    new_df = new_df.sort_values(['n_genres'], ascending=False)
+    return new_df
+    
+df_500_counts = count_columns(df_500_new)
+df_500_counts.head()
+
+df_1000_counts = count_columns(df_1000_new)
+df_1000_counts.head()
+
+print('Spotify-curated playlists:')
+print('The average number of genres per playlist:', round(df_500_counts.n_genres.mean()))
+print('The average number of followers per playlist:', round(df_500_counts.n_followers.mean()))
+
+print('\nuser-curated playlists:')
+print('The average number of genres per playlist:', round(df_1000_counts.n_genres.mean()))
+print('The average number of followers per playlist:', round(df_1000_counts.n_followers.mean()))
 
 # create random sample of the user-curated playlists
 df_1000_final = df_1000_new.sample(n=486, random_state=52)
