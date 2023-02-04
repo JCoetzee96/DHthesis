@@ -6,7 +6,7 @@ from more_itertools import unique_everseen
 import string
 
 # load the datasets
-df_500_OG = pd.read_csv('//data/spotify-500.csv')
+df_500_OG = pd.read_csv('/data/spotify-500.csv')
 df_1000_OG = pd.read_csv('/data/non-spotify-1000.csv')
 
 # inspect the datasets
