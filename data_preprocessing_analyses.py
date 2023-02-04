@@ -46,7 +46,8 @@ print('Spotify-curated playlist \n')
 print('Average number of songs per playlist:',round(df_500_OG.groupby(['playlist_id', 'playlist_name'])['track_name'].count().mean()))
 print('Average number of unique songs per playlist:',round(df_500_OG.groupby(['playlist_id', 'playlist_name'])['track_name'].nunique().mean()))
 # check the playlists with the most number of songs
-df_500_OG.groupby(['playlist_id', 'playlist_name'])['track_name'].nunique().sort_values(ascending=False).reset_index(name='count')
+print(df_500_OG.groupby(['playlist_id', 'playlist_name'])['track_name'].count().sort_values(ascending=False).reset_index(name='count'))
+print(df_500_OG.groupby(['playlist_id', 'playlist_name'])['track_name'].nunique().sort_values(ascending=False).reset_index(name='count'))
 
 boxplot_total(df_1000_sample, 'box_n_songs_1000', 'original')
 boxplot_total(df_1000_sample, 'box_n_unique_songs_1000', 'unique')
@@ -54,7 +55,6 @@ boxplot_total(df_1000_sample, 'box_n_unique_songs_1000', 'unique')
 print('User-curated playlist \n')
 print('Average number of songs per playlist:',round(df_1000_sample.groupby(['playlist_id', 'playlist_name'])['track_name'].count().mean()))
 print('Average number of unique songs per playlist:',round(df_1000_sample.groupby(['playlist_id', 'playlist_name'])['track_name'].nunique().mean()))
-df_1000_sample.groupby(['playlist_id', 'playlist_name'])['track_name'].nunique().sort_values(ascending=False).reset_index(name='count')
 
 # create new dataframes with only required features
 df_500 = df_500_OG[['playlist_id', 'playlist_name', 'user_id', 'playlist_followers', 'primary_artist_genres']]
@@ -95,7 +95,7 @@ def playlist_genres(df):
             names.append(k)
             for i, j in v.items(): # i = genre, j = list of genres
                 g.append(j)
-#
+
     playlist_genre = pd.DataFrame()
     playlist_genre['playlist_id'] = playlist_ids
     playlist_genre['playlist_name'] = names
@@ -121,10 +121,6 @@ print(df_1000_new.info())
 print(df_500_new.isna().sum() * 100 / len(df_1000_new))
 print(df_1000_new.isna().sum() * 100 / len(df_1000_new))
 
-# create random sample of the user-curated playlists
-df_1000_adjusted = df_1000_new.sample(n=486, random_state=52)
-df_1000_adjusted.info()
-
 # create dictionary in which the genre is the key and the value is the frequency
 def counter(df, column):
     count = {}
@@ -137,7 +133,7 @@ def counter(df, column):
     return count
 
 genre_count_500 = counter(df_500_new, 'genres')
-genre_count_1000 = counter(df_1000_adjusted, 'genres')
+genre_count_1000 = counter(df_1000_new, 'genres')
 
 print('Number of unique genres in Spotify-curated playlists dataset:',len(genre_count_500))
 print('Number of unique genres in user-curated playlists dataset:',len(genre_count_1000))
@@ -199,7 +195,7 @@ def genre_playlist(df):
     return count
 
 clean_500 = clean_data(df_500_new)
-clean_1000 = clean_data(df_1000_adjusted)
+clean_1000 = clean_data(df_1000_new)
 
 print('Number of rows in the cleaned Spotify dataset:',clean_500.shape[0])
 print('Number of times the a genre of the playlist is mentioned in the playlist name:',
@@ -225,7 +221,7 @@ def count_columns(df):
 df_500_counts = count_columns(df_500_new)
 df_500_counts.head()
 
-df_1000_counts = count_columns(df_1000_adjusted)
+df_1000_counts = count_columns(df_1000_new)
 df_1000_counts.head()
 
 print('Spotify-curated playlists:')
