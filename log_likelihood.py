@@ -65,38 +65,27 @@ df['processed_texts'] = cleaned_texts
 # create lists of words that do and do not occur in the playlist names of spotify- and user-curated playlists individually
 flatten = lambda t: [item for sublist in t for item in sublist]
 
-subset_spotify = df[(df.curator == 'Spotify')].processed_texts
+subset_spotify = df[(df.curator == 'Spotify')].processed_texts.unique()
 subset_spotify = flatten([text.split() for text in subset_spotify])
 
-subset_not_spotify = df[(df.curator != 'Spotify')].processed_texts
+subset_not_spotify = df[(df.curator != 'Spotify')].processed_texts.unique()
 subset_not_spotify = flatten([text.split() for text in subset_not_spotify])
 
-subset_users = df[(df.curator == 'user')].processed_texts
+subset_users = df[(df.curator == 'user')].processed_texts.unique()
 subset_users = flatten([text.split() for text in subset_users])
 
-subset_not_users = df[(df.curator != 'user')].processed_texts
+subset_not_users = df[(df.curator != 'user')].processed_texts.unique()
 subset_not_users = flatten([text.split() for text in subset_not_users])
 
 # function to obtain the distinctive words per playlist
 def distinctive_words(target_corpus, reference_corpus):
 
-    rem_list = ["00'erne", '101', '12"', '1967ai1975', '1970ai1975', '31', '35', 'aaaaeaeeno',
-                'aaae=aeaeeo', 'aaaeoeoc', 'aaanaiaauauaaau', 'aamiainen', 'aeoeaauauauceTMceuc',
-                'aieuaaaeoeo', 'ao80s', 'aoeaeaa', 'aona=aa', 'aoneai', 'aooaa', 'brnenes', 'bttre',
-                'caetano', 'carrokTM', 'ceTMceuccecciiaa', 'd=a', 'dk', 'du', 'e', 'eTMeo',
-                'eae=eic', 'eaee', 'eaeecc', 'eauaeeaeooa', 'eo=eoaaa', 'eoTMeuaaeua', 'eoaaeuecaea',
-                'eoeeaeaec', 'eoeo', 'eoeooceoeaeue', 'er', 'euaaeoe=ee', 'euaaeoe=eeae=aeaa',
-                'euaaeoe=eeaie=aeaa', 'euaaeoe=eeanaea', 'euaaeoe=eee=aeaaaeaanaea',
-                'euaaeoe=eee=aeo','euaauenae=aeo', 'euaenoeoaeaia', 'euaenoeoaeu', 'fra', 'g', 'gee',
-                'hj', 'hjt', 'hrd', 'hver', 'hyttetur', 'hyv', 'ikin', 'krftskiva', 'ljungstrm',
-                'lo', 'lter', 'mrketid', 'mtes', 'mycket', "n'", 'nofx', 'thal=a', 'fidi', 'die',
-                'kender', 'humr', 'vi', 'tv2', 'di', 'zez', 'fonf', 'trentemller', 'die', 'los',
-                'musik', 'virou', 'back', 'camargo', 'clueso', 'playlist', ' rosana']
+    stopwords = ['los', 'fra', 'de', 'con', 'g', 'en', 'l']
 
     counts_c1 = Counter(target_corpus) # count how often each word occurs
-    counts_c1 = dict([(key, val) for key, val in counts_c1.items() if key not in rem_list]) # remove useless words
+    counts_c1 = dict([(key, val) for key, val in counts_c1.items() if key not in stopwords]) # remove useless words
     counts_c2 = Counter(reference_corpus)
-    counts_c2 = dict([(key, val) for key, val in counts_c2.items() if key not in rem_list])
+    counts_c2 = dict([(key, val) for key, val in counts_c2.items() if key not in stopwords])
     vocabulary = set(list(counts_c1.keys()) + list(counts_c2.keys()))
     freq_c1_total = sum(counts_c1.values())
     freq_c2_total = sum(counts_c2.values())
