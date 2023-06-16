@@ -235,7 +235,7 @@ print('The average number of followers per playlist:', round(df_1000_counts.n_fo
 # create new dataframe in which each row represents an individual (unique) genre per playlist
 def split_sets(df):
     gen = df['genres'].apply(pd.Series).reset_index().melt(id_vars='index').dropna()[['index', 'value']].set_index('index')
-    new_df = gen.merge(df_500_new[['playlist_id', 'playlist_name']], left_index=True, right_index=True, how='right').rename(columns={'value':'genre'})
+    new_df = gen.merge(df[['playlist_id', 'playlist_name']], left_index=True, right_index=True, how='right').rename(columns={'value':'genre'})
     return new_df
 
 df_500_final = split_sets(df_500_new)
